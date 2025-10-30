@@ -1,0 +1,179 @@
+Below is a project style explanation with structured answers suitable for academic submission.
+
+
+---
+
+11. Entity Identification in Airline Reservation System
+
+In an Airline Reservation System, the major entities and their key attributes include:
+
+Entity	Description	Key Attributes
+
+Flight	Represents flight information	Flight_ID (PK), Airline_Name, Source, Destination, Departure_Time, Arrival_Time, Seats_Available, Status
+Passenger	Stores customer information	Passenger_ID (PK), Name, Age, Gender, Contact_No, Email, Address
+Booking	Links passengers to flights and represents reservation transactions	Booking_ID (PK), Passenger_ID (FK), Flight_ID (FK), Booking_Date, Seat_No, Booking_Status
+Payment	Maintains payment records for booked tickets	Payment_ID (PK), Booking_ID (FK), Amount, Payment_Mode, Transaction_Date, Payment_Status
+
+
+Relationships:
+
+One Flight can have multiple Bookings.
+
+One Passenger can make multiple Bookings.
+
+Each Booking has one Payment transaction.
+
+
+
+---
+
+12. Normalization Techniques and Functional Dependencies
+
+Functional Dependencies
+
+Some essential FDs for normalization:
+
+1. Flight_ID → Airline_Name, Source, Destination, Departure_Time, Arrival_Time
+
+
+2. Passenger_ID → Name, Age, Gender, Contact_No, Email
+
+
+3. Booking_ID → Passenger_ID, Flight_ID, Seat_No, Booking_Date
+
+
+4. Booking_ID → Payment_ID → Amount, Payment_Mode, Payment_Status
+
+
+
+Normalization
+
+The schema undergoes three main normalization stages:
+
+1NF
+
+Removed repeating groups such as multiple passengers under a single booking, by separating Passenger and Booking tables.
+
+
+2NF
+
+Ensured no partial dependency on composite keys.
+
+Booking table depends entirely on Booking_ID.
+
+
+3NF
+
+Eliminated transitive dependencies:
+
+Payment details moved to a separate Payment table.
+
+No non-key attribute depends on another non-key attribute.
+
+
+
+The database now satisfies 3NF, reducing redundancy and improving consistency.
+
+
+---
+
+13. SQL Queries
+
+a) Retrieve available flights between two cities
+
+SELECT Flight_ID, Airline_Name, Departure_Time, Arrival_Time, Seats_Available 
+FROM Flight 
+WHERE Source = 'Chennai' 
+AND Destination = 'Delhi' 
+AND Seats_Available > 0;
+
+b) Book a ticket for a passenger
+
+INSERT INTO Booking (Booking_ID, Passenger_ID, Flight_ID, Booking_Date, Seat_No, Booking_Status)
+VALUES (101, 501, 'AI203', CURRENT_DATE, '12A', 'CONFIRMED');
+
+UPDATE Flight 
+SET Seats_Available = Seats_Available - 1 
+WHERE Flight_ID = 'AI203';
+
+c) Cancel a booking
+
+UPDATE Booking 
+SET Booking_Status = 'CANCELLED' 
+WHERE Booking_ID = 101;
+
+UPDATE Flight 
+SET Seats_Available = Seats_Available + 1 
+WHERE Flight_ID = 'AI203';
+
+
+---
+
+14. Concurrency Control in Ticket Booking
+
+When multiple users attempt to book the last remaining seats simultaneously, concurrency issues such as overbooking can occur.
+
+Control Mechanisms:
+
+Locking: Row-level locks on Flight table while updating Seats_Available.
+
+Transactions: ACID properties ensure atomic booking operations.
+
+Isolation Levels: SERIALIZABLE to avoid lost updates.
+
+Optimistic Concurrency: Version control to detect conflicts before final commit.
+
+Pessimistic Concurrency: Prevents conflicts by locking data during update.
+
+
+These strategies guarantee data integrity and prevent duplicate seat allocation.
+
+
+---
+
+15. CRUD Operations in NoSQL Database (MongoDB Example)
+
+Create (Insert Passenger Booking)
+
+db.bookings.insertOne({
+  booking_id: 101,
+  passenger_id: 501,
+  flight_id: "AI203",
+  seat_no: "12A",
+  status: "CONFIRMED"
+});
+
+Read (Retrieve Flight Booking Details)
+
+db.bookings.find({ passenger_id: 501 });
+
+Update (Modify Booking Status)
+
+db.bookings.updateOne(
+  { booking_id: 101 },
+  { $set: { status: "CANCELLED" } }
+);
+
+Delete (Remove Cancelled Booking)
+
+db.bookings.deleteOne({ booking_id: 101 });
+
+
+---
+
+Conclusion
+
+This project implements:
+
+Proper entity design following relational principles.
+
+Normalized database up to 3NF for consistency.
+
+Fundamental SQL operations for reservations.
+
+Concurrency control to avoid booking conflicts.
+
+Modern NoSQL support for scalable reservation tracking.
+
+
+If you need, an ER diagram, system architecture, and a full lab record format can also be provided.
